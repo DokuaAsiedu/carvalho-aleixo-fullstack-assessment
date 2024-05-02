@@ -6,6 +6,10 @@
 		<title>Carvalho Aleixo FullStack Assessment</title>
 	</head>
 	<body>
-		<div id="root">Hello World</div>
+		<form action="/api/scrape" method="get">
+			<label for="keyword">Enter keyword:</label>
+			<input type="text" name="keyword" id="keyword" required />
+			<button type="submit">Search</button>
+		</form>
 	</body>
 </html>

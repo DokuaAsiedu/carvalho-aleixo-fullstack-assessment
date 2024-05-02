@@ -15,3 +15,11 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
 	console.log(`Example app listening on port ${port}!`);
 });
+
+app.get("/api/scrape", (req, res) => {
+	const { keyword } = req.query;
+
+	if (!keyword.trim()) {
+		return res.send("Search keyword should not be null or empty");
+	}
+});
