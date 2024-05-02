@@ -1,0 +1,17 @@
+{
+  "name": "carvalho-aleixo-fullstack-assessment",
+  "version": "1.0.0",
+  "description": "A simple project to scrape the first page of search results from a given keyword from Amazon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "keywords": [
+    "fullstack"
+  ],
+  "author": "Dokua Asiedu",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
