@@ -28,14 +28,31 @@
 				axios
 					.get(`/api/scrape?keyword=${payload.keyword}`)
 					.then((res) => {
-						console.log(res);
+						// console.log(res.data);
+						resultsArr.push(...res.data);
+						fillInData(resultsArr);
+						// console.log(resultsArr);
 					})
 					.catch((err) => {
 						console.log("axios err", err);
 					});
 			}
 
+			function fillInData(data) {
+				data.forEach((item) => {
+					resDiv.innerHTML += `
+            <div class="border-[1px] border-black rounded-lg shadow-md">
+              <img src=${item.imageUrl}/>
+              <p>${item.numOfReviews}</p>
+              <p>${item.rating}</p>
+              <p>${item.title}</p>
+            </div>
+          `;
+					});
+			}
+
 			const form = document.getElementById("form");
+			const resDiv = document.getElementById("results");
 
 			form.addEventListener("submit", handleForm);
 		</script>
