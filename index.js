@@ -33,22 +33,30 @@ app.get("/api/scrape", (req, res) => {
 		.then((dom) => {
 			const searchRes = [
 				...dom.window.document.querySelectorAll(
-					".s-result-item:not(.AdHolder)"
+					"[data-component-type='s-search-result']:not(.AdHolder)"
 				),
 			]
 				.filter((item) => item.getAttribute("data-asin"))
-				.map((item) => ({
-					imageUrl: item.querySelector(".s-image").src,
-					title: item.querySelector("h2").textContent,
-					rating: item.querySelector("a.a-popover-trigger").textContent,
-					numOfReviews: item.querySelector(
-						"[data-csa-c-content-id='alf-customer-ratings-count-component']"
-					).textContent,
-				}));
+				.map((item) => {
+					const textArr = item.textContent.split("  ");
+					const title = textArr[0];
+					const [rating, numOfReviews] = textArr[1].split(" out of 5 stars ");
+					return {
+						imageUrl: item.querySelector(".s-image").src,
+						imageAlt: item.querySelector(".s-image").alt,
+						imageUrlSet: item.querySelector(".s-image").srcset,
+						title,
+						rating,
+						numOfReviews,
+					};
+				});
+
+			// console.log(searchRes);
 
 			res.send(searchRes);
 		})
 		.catch((err) => {
 			res.send(err);
+			console.log(err);
 		});
 });
