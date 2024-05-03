@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Carvalho Aleixo FullStack Assessment</title>
 		<script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
-		<link href="/output-styles.css" rel="stylesheet" />
+		<link href="/css/output-styles.css" rel="stylesheet" />
 	</head>
 	<body>
 		<form id="form">
@@ -13,6 +13,12 @@
 			<input type="text" name="keyword" id="keyword" required />
 			<button type="submit">Search</button>
 		</form>
+
+			<div
+				id="results"
+				class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+			></div>
+		</div>
 
 		<script>
 			function handleForm(event) {
@@ -25,6 +31,10 @@
 					payload[entry[0]] = entry[1];
 				}
 
+				isSearching(true);
+				clearResults();
+				showSpinner(true);
+
 				axios
 					.get(`/api/scrape?keyword=${payload.keyword}`)
 					.then((res) => {
@@ -35,6 +45,9 @@
 					})
 					.catch((err) => {
 						console.log("axios err", err);
+					.finally(() => {
+						isSearching(false);
+						showSpinner(false);
 					});
 			}
 
@@ -51,8 +64,45 @@
 					});
 			}
 
+			function isSearching(bool) {
+				if (bool) {
+					searchBtn.textContent = "Searching...";
+					searchBtn.disabled = true;
+				} else {
+					searchBtn.textContent = "Search";
+					searchBtn.disabled = false;
+				}
+			}
+
+			function clearResults() {
+				resultsArr.splice(0, resultsArr.length);
+				resDiv.innerHTML = "";
+			}
+
+			function showSpinner(bool) {
+				if (bool) {
+					const spinnerDiv = document.createElement("div");
+					const spinner = document.createElement("img");
+
+					spinnerDiv.setAttribute(
+						"class",
+						"col-span-4 justify-self-center flex flex-col items-center"
+					);
+					spinnerDiv.setAttribute("id", "spinner-div");
+					spinner.setAttribute("src", "/images/spinner_icon.svg");
+					spinner.setAttribute("alt", "spinner");
+					spinner.setAttribute("class", "animate-spin");
+
+					spinnerDiv.appendChild(spinner);
+					resDiv.appendChild(spinnerDiv);
+				} else {
+					document.getElementById("spinner-div").remove();
+				}
+			}
+
 			const form = document.getElementById("form");
 			const resDiv = document.getElementById("results");
+			const searchBtn = document.getElementById("search");
 
 			form.addEventListener("submit", handleForm);
 		</script>
