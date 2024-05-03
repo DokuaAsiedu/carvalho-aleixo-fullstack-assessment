@@ -8,11 +8,31 @@
 		<link href="/css/output-styles.css" rel="stylesheet" />
 	</head>
 	<body>
-		<form id="form">
-			<label for="keyword">Enter keyword:</label>
-			<input type="text" name="keyword" id="keyword" required />
-			<button type="submit">Search</button>
-		</form>
+		<div class="container min-w-[280px] flex flex-col gap-4">
+			<h1 class="mt-8 text-2xl text-center">Scrapper</h1>
+
+			<form id="form">
+				<div class="grid grid-cols-1 sm:grid-cols-[auto_min-content] gap-2">
+					<div class="flex flex-row items-stretch gap-2">
+						<label for="keyword" class="self-center">Enter keyword: </label>
+						<input
+							type="text"
+							name="keyword"
+							id="keyword"
+							class="flex-1 px-2 min-w-0 outline outline-gray-600 outline-3 rounded-md"
+							required
+						/>
+					</div>
+
+					<button
+						id="search"
+						type="submit"
+						class="justify-self-center py-1 px-4 bg-blue-800 text-white rounded-lg disabled:cursor-not-allowed disabled:bg-blue-800/50"
+					>
+						Search
+					</button>
+				</div>
+			</form>
 
 			<div
 				id="results"
@@ -21,6 +41,8 @@
 		</div>
 
 		<script>
+			const resultsArr = [];
+
 			function handleForm(event) {
 				event.preventDefault();
 
@@ -38,13 +60,16 @@
 				axios
 					.get(`/api/scrape?keyword=${payload.keyword}`)
 					.then((res) => {
-						// console.log(res.data);
+						// console.log(res);
 						resultsArr.push(...res.data);
 						fillInData(resultsArr);
 						// console.log(resultsArr);
 					})
 					.catch((err) => {
 						console.log("axios err", err);
+						resDiv.innerHTML =
+							"<p>Sorry, something went wrong. Please try again later.</p>";
+					})
 					.finally(() => {
 						isSearching(false);
 						showSpinner(false);
@@ -54,14 +79,14 @@
 			function fillInData(data) {
 				data.forEach((item) => {
 					resDiv.innerHTML += `
-            <div class="border-[1px] border-black rounded-lg shadow-md">
-              <img src=${item.imageUrl}/>
-              <p>${item.numOfReviews}</p>
+            <div class="p-2 flex flex-col items-stretch gap-2 rounded-lg shadow-lg">
+              <img src=${item.imageUrl} srcset=${item.imageUrlSet} alt=${item.imageAlt}/>
+              <p class="self-center font-bold">${item.title}</p>
+              <p>${item.numOfReviews} reviews</p>
               <p>${item.rating}</p>
-              <p>${item.title}</p>
             </div>
           `;
-					});
+				});
 			}
 
 			function isSearching(bool) {
