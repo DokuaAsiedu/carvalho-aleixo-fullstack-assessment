@@ -4,12 +4,39 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Carvalho Aleixo FullStack Assessment</title>
+		<script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
 	</head>
 	<body>
-		<form action="/api/scrape" method="get">
+		<form id="form">
 			<label for="keyword">Enter keyword:</label>
 			<input type="text" name="keyword" id="keyword" required />
 			<button type="submit">Search</button>
 		</form>
+
+		<script>
+			function handleForm(event) {
+				event.preventDefault();
+
+				const formData = new FormData(event.target);
+				const payload = {};
+
+				for (entry of formData.entries()) {
+					payload[entry[0]] = entry[1];
+				}
+
+				axios
+					.get(`/api/scrape?keyword=${payload.keyword}`)
+					.then((res) => {
+						console.log(res);
+					})
+					.catch((err) => {
+						console.log("axios err", err);
+					});
+			}
+
+			const form = document.getElementById("form");
+
+			form.addEventListener("submit", handleForm);
+		</script>
 	</body>
 </html>
