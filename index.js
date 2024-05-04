@@ -12,6 +12,7 @@ app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/index.html", (err) => {
 		if (err) {
 			console.log(err);
+			res.render("Please reload the page");
 		} else {
 			console.log("Successfully sent index.html");
 		}
@@ -19,7 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-	console.log(`Example app listening on port ${port}!`);
+	console.log(`Scrapper app listening on port ${port}!`);
 });
 
 app.get("/api/scrape", (req, res) => {
@@ -29,6 +30,7 @@ app.get("/api/scrape", (req, res) => {
 		return res.send("Search keyword should not be null or empty");
 	}
 
+	// use jsdom to get the html from search results page and clean the data to send search results as a list of objects containing data needed for rendering
 	JSDOM.fromURL(`https://www.amazon.com/s?k=${keyword}`)
 		.then((dom) => {
 			const searchRes = [

@@ -41,7 +41,7 @@
 		</div>
 
 		<script>
-			const resultsArr = [];
+			const resultsArr = []; //will hold search results from get request
 
 			function handleForm(event) {
 				event.preventDefault();
@@ -68,7 +68,7 @@
 					.catch((err) => {
 						console.log("axios err", err);
 						resDiv.innerHTML =
-							"<p>Sorry, something went wrong. Please try again later.</p>";
+							"<p class='col-span-4 text-center'>Sorry, something went wrong. Please try again later.</p>";
 					})
 					.finally(() => {
 						isSearching(false);
@@ -77,19 +77,26 @@
 			}
 
 			function fillInData(data) {
-				data.forEach((item) => {
-					resDiv.innerHTML += `
-            <div class="p-2 flex flex-col items-stretch gap-2 rounded-lg shadow-lg">
-              <img src=${item.imageUrl} srcset=${item.imageUrlSet} alt=${item.imageAlt}/>
-              <p class="self-center font-bold">${item.title}</p>
-              <p>${item.numOfReviews} reviews</p>
-              <p>${item.rating}</p>
-            </div>
-          `;
-				});
+				// will populate the div with the fetched data
+				if (data.length > 0) {
+					data.forEach((item) => {
+						resDiv.innerHTML += `
+              <div class="p-2 flex flex-col items-stretch gap-2 rounded-lg shadow-lg">
+                <img src=${item.imageUrl} srcset=${item.imageUrlSet} alt=${item.imageAlt}/>
+                <p class="self-center font-bold">${item.title}</p>
+                <p>${item.numOfReviews} reviews</p>
+                <p>${item.rating}</p>
+              </div>
+            `;
+					});
+				} else {
+					resDiv.innerHTML =
+						"<p class='col-span-4 text-center'>Sorry no search results match your query</p>";
+				}
 			}
 
 			function isSearching(bool) {
+				// enable/disable and change text of search button while/after searching
 				if (bool) {
 					searchBtn.textContent = "Searching...";
 					searchBtn.disabled = true;
@@ -100,11 +107,13 @@
 			}
 
 			function clearResults() {
+				// clear the div and fetched data array
 				resultsArr.splice(0, resultsArr.length);
 				resDiv.innerHTML = "";
 			}
 
 			function showSpinner(bool) {
+				// use a spinner to indicate data is being fetched
 				if (bool) {
 					const spinnerDiv = document.createElement("div");
 					const spinner = document.createElement("img");
