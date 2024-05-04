@@ -1,144 +1,141 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Carvalho Aleixo FullStack Assessment</title>
-		<script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
-		<link href="/css/output-styles.css" rel="stylesheet" />
-	</head>
-	<body>
-		<div class="container min-w-[280px] flex flex-col gap-4">
-			<h1 class="mt-8 text-2xl text-center">Scrapper</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carvalho Aleixo FullStack Assessment</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+    <link href="/css/output-styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container min-w-[280px] flex flex-col gap-4">
+      <h1 class="mt-8 text-2xl text-center">Scrapper</h1>
 
-			<form id="form">
-				<div class="grid grid-cols-1 sm:grid-cols-[auto_min-content] gap-2">
-					<div class="flex flex-row items-stretch gap-2">
-						<label for="keyword" class="self-center">Enter keyword: </label>
-						<input
-							type="text"
-							name="keyword"
-							id="keyword"
-							class="flex-1 px-2 min-w-0 outline outline-gray-600 outline-3 rounded-md"
-							required
-						/>
-					</div>
+      <form id="form">
+        <div class="grid grid-cols-1 sm:grid-cols-[auto_min-content] gap-2">
+          <div class="flex flex-row items-stretch gap-2">
+            <label for="keyword" class="self-center">Enter keyword: </label>
+            <input
+              type="text"
+              name="keyword"
+              id="keyword"
+              class="flex-1 px-2 min-w-0 outline outline-gray-600 outline-3 rounded-md"
+              required />
+          </div>
 
-					<button
-						id="search"
-						type="submit"
-						class="justify-self-center py-1 px-4 bg-blue-800 text-white rounded-lg disabled:cursor-not-allowed disabled:bg-blue-800/50"
-					>
-						Search
-					</button>
-				</div>
-			</form>
+          <button
+            id="search"
+            type="submit"
+            class="justify-self-center py-1 px-4 bg-blue-800 text-white rounded-lg disabled:cursor-not-allowed disabled:bg-blue-800/50">
+            Search
+          </button>
+        </div>
+      </form>
 
-			<div
-				id="results"
-				class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-			></div>
-		</div>
+      <div
+        id="results"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+    </div>
 
-		<script>
-			const resultsArr = []; //will hold search results from get request
+    <script>
+      const resultsArr = [] //will hold search results from get request
 
-			function handleForm(event) {
-				event.preventDefault();
+      function handleForm(event) {
+        event.preventDefault()
 
-				const formData = new FormData(event.target);
-				const payload = {};
+        const formData = new FormData(event.target)
+        const payload = {}
 
-				for (entry of formData.entries()) {
-					payload[entry[0]] = entry[1];
-				}
+        for (entry of formData.entries()) {
+          payload[entry[0]] = entry[1]
+        }
 
-				isSearching(true);
-				clearResults();
-				showSpinner(true);
+        isSearching(true)
+        clearResults()
+        showSpinner(true)
 
-				axios
-					.get(`/api/scrape?keyword=${payload.keyword}`)
-					.then((res) => {
-						// console.log(res);
-						resultsArr.push(...res.data);
-						fillInData(resultsArr);
-						// console.log(resultsArr);
-					})
-					.catch((err) => {
-						console.log("axios err", err);
-						resDiv.innerHTML =
-							"<p class='col-span-4 text-center'>Sorry, something went wrong. Please try again later.</p>";
-					})
-					.finally(() => {
-						isSearching(false);
-						showSpinner(false);
-					});
-			}
+        axios
+          .get(`/api/scrape?keyword=${payload.keyword}`)
+          .then((res) => {
+            // console.log(res);
+            resultsArr.push(...res.data)
+            fillInData(resultsArr)
+            // console.log(resultsArr);
+          })
+          .catch((err) => {
+            console.log("axios err", err)
+            resDiv.innerHTML =
+              "<p class='col-span-4 text-center'>Sorry, something went wrong. Please try again later.</p>"
+          })
+          .finally(() => {
+            isSearching(false)
+            showSpinner(false)
+          })
+      }
 
-			function fillInData(data) {
-				// will populate the div with the fetched data
-				if (data.length > 0) {
-					data.forEach((item) => {
-						resDiv.innerHTML += `
+      function fillInData(data) {
+        // will populate the div with the fetched data
+        if (data.length > 0) {
+          data.forEach((item) => {
+            resDiv.innerHTML += `
               <div class="p-2 flex flex-col items-stretch gap-2 rounded-lg shadow-lg">
                 <img src=${item.imageUrl} srcset=${item.imageUrlSet} alt=${item.imageAlt}/>
                 <p class="self-center font-bold">${item.title}</p>
                 <p>${item.numOfReviews} reviews</p>
                 <p>${item.rating}</p>
               </div>
-            `;
-					});
-				} else {
-					resDiv.innerHTML =
-						"<p class='col-span-4 text-center'>Sorry no search results match your query</p>";
-				}
-			}
+            `
+          })
+        } else {
+          resDiv.innerHTML =
+            "<p class='col-span-4 text-center'>Sorry no search results match your query</p>"
+        }
+      }
 
-			function isSearching(bool) {
-				// enable/disable and change text of search button while/after searching
-				if (bool) {
-					searchBtn.textContent = "Searching...";
-					searchBtn.disabled = true;
-				} else {
-					searchBtn.textContent = "Search";
-					searchBtn.disabled = false;
-				}
-			}
+      function isSearching(bool) {
+        // enable/disable and change text of search button while/after searching
+        if (bool) {
+          searchBtn.textContent = "Searching..."
+          searchBtn.disabled = true
+        } else {
+          searchBtn.textContent = "Search"
+          searchBtn.disabled = false
+        }
+      }
 
-			function clearResults() {
-				// clear the div and fetched data array
-				resultsArr.splice(0, resultsArr.length);
-				resDiv.innerHTML = "";
-			}
+      function clearResults() {
+        // clear the div and fetched data array
+        resultsArr.splice(0, resultsArr.length)
+        resDiv.innerHTML = ""
+      }
 
-			function showSpinner(bool) {
-				// use a spinner to indicate data is being fetched
-				if (bool) {
-					const spinnerDiv = document.createElement("div");
-					const spinner = document.createElement("img");
+      function showSpinner(bool) {
+        // use a spinner to indicate data is being fetched
+        if (bool) {
+          const spinnerDiv = document.createElement("div")
+          const spinner = document.createElement("img")
 
-					spinnerDiv.setAttribute(
-						"class",
-						"col-span-4 justify-self-center flex flex-col items-center"
-					);
-					spinnerDiv.setAttribute("id", "spinner-div");
-					spinner.setAttribute("src", "/images/spinner_icon.svg");
-					spinner.setAttribute("alt", "spinner");
-					spinner.setAttribute("class", "animate-spin");
+          spinnerDiv.setAttribute(
+            "class",
+            "col-span-4 justify-self-center flex flex-col items-center"
+          )
+          spinnerDiv.setAttribute("id", "spinner-div")
+          spinner.setAttribute("src", "/images/spinner_icon.svg")
+          spinner.setAttribute("alt", "spinner")
+          spinner.setAttribute("class", "animate-spin")
 
-					spinnerDiv.appendChild(spinner);
-					resDiv.appendChild(spinnerDiv);
-				} else {
-					document.getElementById("spinner-div").remove();
-				}
-			}
+          spinnerDiv.appendChild(spinner)
+          resDiv.appendChild(spinnerDiv)
+        } else {
+          document.getElementById("spinner-div").remove()
+        }
+      }
 
-			const form = document.getElementById("form");
-			const resDiv = document.getElementById("results");
-			const searchBtn = document.getElementById("search");
+      const form = document.getElementById("form")
+      const resDiv = document.getElementById("results")
+      const searchBtn = document.getElementById("search")
 
-			form.addEventListener("submit", handleForm);
-		</script>
-	</body>
+      form.addEventListener("submit", handleForm)
+    </script>
+  </body>
 </html>
